@@ -72,19 +72,52 @@ Returns a promise that either resolves when all of the promises in the iterable 
 
 **Example**
 ```python
+from promises import Promise
 
 promise_a = Promise.resolve('promise_a')
 
 promise_b = Promise.reject('promise_b')
 
-promise_c = Promise.all([promise_a, promise_b])
+promise_all_1 = Promise.all([promise_a, promise_b])
 
-promise_d = Promise.all([promise_a])
+promise_all_2 = Promise.all([promise_a])
 
-# will yield in a rejected promise_c with the reason "promise_b"
-# will yield in a resolved promise_d with the value "promise_a"
+# will yield in a rejected promise_all_1 with the reason "promise_b"
+# will yield in a resolved promise_all_2 with the value "promise_a"
 ```
 
 ### .race(iterable)
 
 Returns a promise that resolves or rejects as soon as one of the promises in the iterable resolves or rejects, with the value or reason from that promise.
+
+**Example**
+```python
+import time
+
+from promises import Promise
+
+def promiseA(resolve, reject):
+    time.sleep(4)
+
+    resolve('promise_a')
+
+def promiseB(resolve, reject):
+    time.sleep(2)
+
+    resolve('promise_b')
+
+def promiseC(resolve, reject):
+    time.sleep(6)
+
+    reject('promise_c')
+
+promise_a = Promise(promiseA)
+
+promise_b = Promise(promiseB)
+
+promise_c = Promise(promiseC)
+
+promise_race_1 = Promise.race([promise_a, promise_b, promise_c])
+
+# will yield in a resolved promise_race_1 with the reason "promise_b"
+```
