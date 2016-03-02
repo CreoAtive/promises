@@ -20,7 +20,7 @@ def executor(resolve, reject):
 
 promise = Promise(executor)
 
-# will execute the executor and resolve to either "This was awesome" or "This does not work"
+# will execute the executor method and resolve to either "This was awesome" or "This does not work"
 ```
 
 ## Chaining
@@ -49,9 +49,9 @@ You can catch rejections by appending **.catch()** to the promise and pass an on
 
 ```python
 def onFinishHandler(value):
-    print 'The promise chain is finished'
+    print 'The promise chain has finished'
 
 promise.catch(onRejectedHandler).then(onFinishHandler)
 
-# will print "The promise chain is finished"
+# will print "The promise chain has finished"
 ```
