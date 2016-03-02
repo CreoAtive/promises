@@ -9,6 +9,26 @@ logging.getLogger('requests').setLevel(logging.WARNING)
 from threading import Thread
 from threading import Event
 
+class StoppableThread(Thread):
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self, group = None, target = None, *args, **kwargs):
+        super(StoppableThread, self).__init__()
+        self._stop = threading.Event()
+        self._target = target
+        self._args = args
+
+    def run(self):
+        if not self.isStopped():
+            pass
+
+    def stop(self):
+        self._stop.set()
+
+    def isStopped(self):
+        return self._stop.isSet()
+
 class Promise(object):
 
     def __init__(self, resolver = None):
@@ -203,19 +223,18 @@ class Promise(object):
 
     @staticmethod
     def race(promises):
+        threads = []
         new_promise = Promise()
 
-        def deferredTask():
-            for index, promise in enumerate(promises):
-                promise.wait()
+        def deferredTask(promise):
+            promise.wait()
 
-                if promise.isRejected():
-                    new_promise._reject(promise.result)
-                else:
-                    new_promise._resolve(promise.result)
+            if promise.isRejected():
+                new_promise._reject(promise.result())
+            else:
+                new_promise._resolve(promise.result())
 
-                break
-
-        Thread(target = deferredTask).start()
+        for index, promise in enumerate(promises):
+            threads.append(Thread(target = deferredTask, args = (promise, )).start())
 
         return new_promise
