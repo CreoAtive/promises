@@ -10,37 +10,43 @@ import requests
 import time
 
 def requestPromiseTest():
-    def makeRequest(resolve, reject):
-        logging.info('makeRequest')
+    def executor(resolve, reject):
+        time.sleep(2)
 
-        #time.sleep(2)
+        resolve('foobar')
 
-        #resolve('foobar')
+    def resolve():
+        time.sleep(2)
 
-        r = requests.get('http://jsonplaceholder.typicode.com/posts')
+        return 'foobar'
 
-        if r.status_code == 200:
-            resolve(r)
-        else:
-            reject(r.status_code)
-
-    def handleSuccess(response):
+    def handleSuccess(*args):
         logging.info('handleSuccess')
 
-        return response.json()
-
-    def handleFailure(reason):
-        logging.info('handleFailure: {}'.format(reason))
-
-    def printData(data):
-        logging.info('printData: {}'.format(data))
+    def handleFailure(*args):
+        logging.info('handleFailure: {}'.format(args))
 
     def finish(*args):
-        logging.info('finish: {}'.format(args))
+        logging.info('finish')
 
-    promise = promises.Promise(makeRequest, None, 'Original').then(handleSuccess, None, 'handleSuccess').then(printData, None, 'printData').then(None, handleFailure, 'handleFailure').then(finish, None, 'finish')
+    first_promise = promises.Promise.resolve(resolve).then(handleSuccess, handleFailure).then(finish)
 
-    print 'foo'
+    def secondPromiseSuccess(*args):
+        logging.info('secondPromiseSuccess')
+
+        time.sleep(2)
+
+    def secondPromiseFailure(*args):
+        logging.info('secondPromiseFailure {}'.format(args))
+
+    def secondFinish(*args):
+        logging.info('secondFinish')
+
+    second_promise = promises.Promise.resolve(first_promise).then(secondPromiseSuccess, secondPromiseFailure).then(secondFinish)
+
+    logging.info('foo')
+
+    third_promise = promises.Promise.race([first_promise, second_promise]).then(lambda *args: logging.info('thirdPromiseSuccess'), lambda *args: logging.warning('thirdPromiseFailure'))
 
 def main():
     requestPromiseTest()
