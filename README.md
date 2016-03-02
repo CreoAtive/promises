@@ -64,7 +64,11 @@ promise.catch(onRejectedHandler).then(onFinishHandler)
 
 ### .resolve(value)
 
+Returns a Promise object that is resolved with the given value. If the value is a thenable (i.e. has a then method), the returned promise will "follow" that thenable, adopting its eventual state; otherwise the returned promise will be fulfilled with the value. Generally, if you want to know if a value is a promise or not - Promise.resolve(value) it instead and work with the return value as a promise.
+
 ### .reject(reason)
+
+Returns a Promise object that is rejected with the given reason.
 
 ### .all(iterable)
 
