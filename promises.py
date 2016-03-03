@@ -2,32 +2,8 @@ import traceback
 import logging
 import json
 
-logging.basicConfig(level=logging.DEBUG)
-
-logging.getLogger('requests').setLevel(logging.WARNING)
-
 from threading import Thread
 from threading import Event
-
-class StoppableThread(Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
-
-    def __init__(self, group = None, target = None, *args, **kwargs):
-        super(StoppableThread, self).__init__()
-        self._stop = threading.Event()
-        self._target = target
-        self._args = args
-
-    def run(self):
-        if not self.isStopped():
-            pass
-
-    def stop(self):
-        self._stop.set()
-
-    def isStopped(self):
-        return self._stop.isSet()
 
 class Promise(object):
 
